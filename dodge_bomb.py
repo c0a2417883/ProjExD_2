@@ -2,6 +2,7 @@ import os
 import sys
 import pygame as pg
 import random
+import time
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -63,10 +64,32 @@ def main():
 
         bb_rct.move_ip(vx, vy)
 
+        def gameover(screen: pg.Surface) -> None:
+            """
+            ゲームオーバー時に，半透明の黒い画面上に「Game Over」と表
+            示し，泣いているこうかとん画像を貼り付ける関数
+            """
+            gameover_sur = pg.Surface((1100, 650))
+            font = pg.font.Font(None, 80)
+            cry = pg.image.load("fig/8.png") 
+            cry2 = pg.image.load("fig/8.png") 
+            gameover_txt = font.render("Game Over",True,(255, 255, 255))
+            gameover_sur.set_alpha(130)
+            pg.draw.rect(gameover_sur, (0, 0, 0), pg.Rect(0, 0, 1100, 650))
+            screen.blit(gameover_sur, [0, 0])
+            screen.blit(gameover_txt, [400, 300])
+            screen.blit(cry, [340, 290])
+            screen.blit(cry2, [723, 290])
+            
+            
+
         if kk_rct.colliderect(bb_rct):
+            gameover(screen)
+            time.sleep(5)
+            pg.display.update()
             return
         
-        
+
 
         pg.display.update()
         tmr += 1
