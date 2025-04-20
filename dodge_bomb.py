@@ -24,10 +24,8 @@ def main():
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(100,300), random.randint(100,300)
-    vx = 0
-    vy = 0
-    vx += 5
-    vy += 5
+    vx = 5
+    vy = 5
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -45,9 +43,6 @@ def main():
                 sum_mv[1] += delta[1]
 
         kk_rct.move_ip(sum_mv)
-        
-        screen.blit(kk_img, kk_rct)
-        screen.blit(bb_img, bb_rct)
 
         def check_bound(re):
             if re.top <= 0 or re.right >= 1100 or re.bottom >= 650 or re.left <= 0:
@@ -56,13 +51,13 @@ def main():
                 return True
         if check_bound(kk_rct) == False:
             kk_rct.center = kk_rct2
-        if check_bound(bb_rct) == False:
-            if bb_rct.bottom >= 650 or bb_rct.top <= 0:
-                vy = -vy
-            if bb_rct.right >= 1100 or bb_rct.left <= 0:
-                vx = -vx
+        # if check_bound(bb_rct) == False:
+        #     if bb_rct.bottom >= 650 or bb_rct.top <= 0:
+        #         vy = -vy
+        #     if bb_rct.right >= 1100 or bb_rct.left <= 0:
+        #         vx = -vx
 
-        bb_rct.move_ip(vx, vy)
+        # bb_rct.move_ip(vx, vy)
 
         def gameover(screen: pg.Surface) -> None:
             """
@@ -82,14 +77,47 @@ def main():
             screen.blit(cry2, [723, 290])
             pg.display.update()
             time.sleep(5)
+        
+        
+
+        def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+            """
+            サイズの異なる爆弾Surfaceを要素としたリストと加速度リスト
+            を返す
+            """
+            bb_imgs = []
             
+            for r in range(1, 11):
+                bb_img = pg.Surface((20*r, 20*r))
+                pg.draw.circle(bb_img,(255, 0, 0), (10*r, 10*r), 10*r)
+                bb_img.set_colorkey((0, 0, 0))
+                bb_imgs.append(bb_img)
+            bb_accs = [a for a in range(1, 11)]
+            return bb_imgs, bb_accs
+                
+        if check_bound(bb_rct) == False:
+            if bb_rct.bottom >= 650 or bb_rct.top <= 0:
+                vy = -vy
+            if bb_rct.right >= 1100 or bb_rct.left <= 0:
+                vx = -vx
+        
+        bb_imgs, bb_accs = init_bb_imgs()
+        # tmrを500で割った商と9を比較し，小さい方を選択
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+
+        bb_rct.move_ip(avx, avy)  
             
 
         if kk_rct.colliderect(bb_rct):
             gameover(screen)
             return
         
-
+        
+        screen.blit(kk_img, kk_rct)
+        screen.blit(bb_img, bb_rct)
+        
 
         pg.display.update()
         tmr += 1
