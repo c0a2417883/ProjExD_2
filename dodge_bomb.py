@@ -27,6 +27,7 @@ def main():
     bb_rct.center = random.randint(0,1100), random.randint(0,650)
     vx = 5
     vy = 5
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -42,22 +43,11 @@ def main():
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
 
-        
-
         def check_bound(re):
             if re.top <= 0 or re.right >= 1100 or re.bottom >= 650 or re.left <= 0:
                 return False
             else:
                 return True
-        # if check_bound(kk_rct) == False:
-        #     kk_rct.center = kk_rct2
-        # if check_bound(bb_rct) == False:
-        #     if bb_rct.bottom >= 650 or bb_rct.top <= 0:
-        #         vy = -vy
-        #     if bb_rct.right >= 1100 or bb_rct.left <= 0:
-        #         vx = -vx
-
-        # bb_rct.move_ip(vx, vy)
 
         def gameover(screen: pg.Surface) -> None:
             """
@@ -78,8 +68,6 @@ def main():
             pg.display.update()
             time.sleep(5)
         
-        
-
         def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
             """
             サイズの異なる爆弾Surfaceを要素としたリストと加速度リスト
@@ -111,46 +99,34 @@ def main():
                         (-5, -5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 315, 0.9)}
             return koukaton[sum_mv]
         
+        
         def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float]) -> tuple[float, float]:
             """
             orgから見て，dstがどこにあるかを計算し，方向ベクトルをタプルで返す
             """
+            
             bb_x, bb_y = org.center
             kk_x, kk_y = dst.center
             dx = kk_x - bb_x
             dy = kk_y - bb_y
-            norm = math.sqrt(dx**2+dy**2)
-            # if norm < 300:
-            #     last_d = (5, 0)
-            
-            dx = dx / norm
-            dy = dy / norm
-            dx = dx * math.sqrt(50)
-            dy = dy * math.sqrt(50)
-            last_d = (dx, dy)
-
-
-
+            norm = math.sqrt(dx**2 + dy**2)
+            if norm < 300:
+                last_d = (dx / norm , dy / norm )
+            else:
+                dx = dx / norm
+                dy = dy / norm
+                now_bb = (dx, dy)
+                dx = dx * math.sqrt(50)
+                dy = dy * math.sqrt(50)
+                last_d = (dx, dy)
 
             return last_d
         
-        # vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
+        vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
 
         kk_img = get_kk_img((0, 0))
         kk_img = get_kk_img(tuple(sum_mv))
 
-        # kk_rct = kk_img.get_rect()
-        # kk_rct.center = 300, 200
-
-        # kk_rct2 = kk_rct.center
-        # for key, delta in DELTA.items():
-        #     if key_lst[key]:
-        #         sum_mv[0] += delta[0]
-        #         sum_mv[1] += delta[1]
-                
-        # if check_bound(kk_rct) == False:
-        #     kk_rct.center = kk_rct2
-        # print(kk_rct2)
         if check_bound(bb_rct) == False:
             if bb_rct.bottom >= 650 or bb_rct.top <= 0:
                 vy = -vy
@@ -163,10 +139,8 @@ def main():
         avy = vy*bb_accs[min(tmr//500, 9)]
         bb_img = bb_imgs[min(tmr//500, 9)]
 
-
         bb_rct.move_ip(avx, avy)  
         kk_rct.move_ip(sum_mv)
-            
 
         if kk_rct.colliderect(bb_rct):
             gameover(screen)
@@ -181,7 +155,6 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 
 if __name__ == "__main__":
