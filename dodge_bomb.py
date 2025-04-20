@@ -3,6 +3,7 @@ import sys
 import pygame as pg
 import random
 import time
+import math
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -48,8 +49,8 @@ def main():
                 return False
             else:
                 return True
-        if check_bound(kk_rct) == False:
-            kk_rct.center = kk_rct2
+        # if check_bound(kk_rct) == False:
+        #     kk_rct.center = kk_rct2
         # if check_bound(bb_rct) == False:
         #     if bb_rct.bottom >= 650 or bb_rct.top <= 0:
         #         vy = -vy
@@ -109,11 +110,47 @@ def main():
                         (-5, 0) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),
                         (-5, -5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 315, 0.9)}
             return koukaton[sum_mv]
+        
+        def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float]) -> tuple[float, float]:
+            """
+            orgから見て，dstがどこにあるかを計算し，方向ベクトルをタプルで返す
+            """
+            bb_x, bb_y = org.center
+            kk_x, kk_y = dst.center
+            dx = kk_x - bb_x
+            dy = kk_y - bb_y
+            norm = math.sqrt(dx**2+dy**2)
+            # if norm < 300:
+            #     last_d = (5, 0)
+            
+            dx = dx / norm
+            dy = dy / norm
+            dx = dx * math.sqrt(50)
+            dy = dy * math.sqrt(50)
+            last_d = (dx, dy)
+
+
+
+
+            return last_d
+        
+        # vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
 
         kk_img = get_kk_img((0, 0))
         kk_img = get_kk_img(tuple(sum_mv))
-        print(sum_mv)
+
+        # kk_rct = kk_img.get_rect()
+        # kk_rct.center = 300, 200
+
+        # kk_rct2 = kk_rct.center
+        # for key, delta in DELTA.items():
+        #     if key_lst[key]:
+        #         sum_mv[0] += delta[0]
+        #         sum_mv[1] += delta[1]
                 
+        # if check_bound(kk_rct) == False:
+        #     kk_rct.center = kk_rct2
+        # print(kk_rct2)
         if check_bound(bb_rct) == False:
             if bb_rct.bottom >= 650 or bb_rct.top <= 0:
                 vy = -vy
@@ -126,6 +163,7 @@ def main():
         avy = vy*bb_accs[min(tmr//500, 9)]
         bb_img = bb_imgs[min(tmr//500, 9)]
 
+
         bb_rct.move_ip(avx, avy)  
         kk_rct.move_ip(sum_mv)
             
@@ -134,10 +172,11 @@ def main():
             gameover(screen)
             return
         
+        if check_bound(kk_rct) == False:
+            kk_rct.center = kk_rct2
         
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
-        
 
         pg.display.update()
         tmr += 1
