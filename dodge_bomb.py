@@ -65,6 +65,8 @@ def main():
 
         if kk_rct.colliderect(bb_rct):
             return
+        
+        
 
         pg.display.update()
         tmr += 1
