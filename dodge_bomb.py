@@ -80,13 +80,13 @@ def main():
             screen.blit(gameover_txt, [400, 300])
             screen.blit(cry, [340, 290])
             screen.blit(cry2, [723, 290])
+            pg.display.update()
+            time.sleep(5)
             
             
 
         if kk_rct.colliderect(bb_rct):
             gameover(screen)
-            time.sleep(5)
-            pg.display.update()
             return
         
 
