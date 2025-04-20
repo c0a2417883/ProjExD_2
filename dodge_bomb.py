@@ -23,7 +23,7 @@ def main():
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
-    bb_rct.center = random.randint(100,300), random.randint(100,300)
+    bb_rct.center = random.randint(0,1100), random.randint(0,650)
     vx = 5
     vy = 5
     while True:
@@ -34,15 +34,14 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        
-        
+
         kk_rct2 = kk_rct.center
         for key, delta in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
 
-        kk_rct.move_ip(sum_mv)
+        
 
         def check_bound(re):
             if re.top <= 0 or re.right >= 1100 or re.bottom >= 650 or re.left <= 0:
@@ -94,6 +93,26 @@ def main():
                 bb_imgs.append(bb_img)
             bb_accs = [a for a in range(1, 11)]
             return bb_imgs, bb_accs
+        
+        def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+
+            """
+            移動量の合計値タプルに対応する向きの画像Surfaceを返す
+            """
+            koukaton = {(0, 0) :  pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9), 
+                        (0, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 270, 0.9),
+                        (+5, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 225, 0.9),
+                        (+5, 0) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 180, 0.9),
+                        (+5, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 135, 0.9),
+                        (0, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 90, 0.9),
+                        (-5, +5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),
+                        (-5, 0) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),
+                        (-5, -5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 315, 0.9)}
+            return koukaton[sum_mv]
+
+        kk_img = get_kk_img((0, 0))
+        kk_img = get_kk_img(tuple(sum_mv))
+        print(sum_mv)
                 
         if check_bound(bb_rct) == False:
             if bb_rct.bottom >= 650 or bb_rct.top <= 0:
@@ -108,6 +127,7 @@ def main():
         bb_img = bb_imgs[min(tmr//500, 9)]
 
         bb_rct.move_ip(avx, avy)  
+        kk_rct.move_ip(sum_mv)
             
 
         if kk_rct.colliderect(bb_rct):
