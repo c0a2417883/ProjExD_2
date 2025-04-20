@@ -23,6 +23,10 @@ def main():
     bb_img.set_colorkey((0, 0, 0))
     bb_rct = bb_img.get_rect()
     bb_rct.center = random.randint(100,300), random.randint(100,300)
+    vx = 0
+    vy = 0
+    vx += 5
+    vy += 5
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -31,23 +35,41 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        vx = 0
-        vy = 0
-        vx += 5
-        vy += 5
-
+        
+        
+        kk_rct2 = kk_rct.center
         for key, delta in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += delta[0]
                 sum_mv[1] += delta[1]
 
         kk_rct.move_ip(sum_mv)
-        bb_rct.move_ip(vx, vy)
+        
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
+
+        def check_bound(re):
+            if re.top <= 0 or re.right >= 1100 or re.bottom >= 650 or re.left <= 0:
+                return False
+            else:
+                return True
+        if check_bound(kk_rct) == False:
+            kk_rct.center = kk_rct2
+        if check_bound(bb_rct) == False:
+            if bb_rct.bottom >= 650 or bb_rct.top <= 0:
+                vy = -vy
+            if bb_rct.right >= 1100 or bb_rct.left <= 0:
+                vx = -vx
+
+        bb_rct.move_ip(vx, vy)
+
+        if kk_rct.colliderect(bb_rct):
+            return
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
+
 
 
 if __name__ == "__main__":
