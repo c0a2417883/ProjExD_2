@@ -35,6 +35,8 @@ def gameover(screen: pg.Surface) -> None:
     """
     ゲームオーバー時に，半透明の黒い画面上に「Game Over」と表
     示し，泣いているこうかとん画像を貼り付ける関数
+    引数：Rect
+    戻り値：なし
     """
     gameover_sur = pg.Surface((WIDTH, HEIGHT))
     font = pg.font.Font(None, 80)
@@ -103,7 +105,7 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float])
 def elapsed_time(start_time: float, font: pg.font) -> pg.Surface:
     """
     独自の機能
-    経過時間のSurfaceを返す
+    経過時間の文字Surfaceを返す
     """
     elaps = 0
     end = time.perf_counter()
