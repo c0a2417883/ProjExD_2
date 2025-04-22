@@ -26,6 +26,7 @@ def check_bound(re: pg.Rect) -> tuple[bool, bool]:
     # 横方向判定
     if re.left < 0 or WIDTH < re.right:
         yoko = False
+    # 縦方向判定
     if re.top < 0 or HEIGHT < re.bottom:
         tate = False
     return yoko, tate
@@ -90,14 +91,10 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float])
     dy = kk_y - bb_y
     norm = math.sqrt(dx**2 + dy**2)
     if norm < 300:
-        last_d = (dx / norm , dy / norm )
-    else:
-        dx = dx / norm
-        dy = dy / norm
-        now_bb = (dx, dy)
-        dx = dx * math.sqrt(50)
-        dy = dy * math.sqrt(50)
-        last_d = (dx, dy)
+        return (current_xy[0], current_xy[1])
+    dx = dx * math.sqrt(50) / norm
+    dy = dy * math.sqrt(50) / norm
+    last_d = (dx, dy)
 
     return last_d
             
@@ -126,10 +123,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
-
-        # こうかとんと爆弾がかさなったら
         
-
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
 
@@ -137,20 +131,22 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += delta[0]  # 左右方向
                 sum_mv[1] += delta[1]  # 上下方向     
-        
-        vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
 
+        # 飛ぶ方向に従ってこうかとん画像を切り替える
         kk_img = get_kk_img((0, 0))
         kk_img = get_kk_img(tuple(sum_mv))
         
+        # 時間とともに爆弾が拡大，加速する
         bb_imgs, bb_accs = init_bb_imgs()
         # tmrを500で割った商と9を比較し，小さい方を選択
         avx = vx * bb_accs[min(tmr//500, 9)]
         avy = vy * bb_accs[min(tmr//500, 9)]
         bb_img = bb_imgs[min(tmr//500, 9)]
 
+        # 追従性爆弾
+        vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
+
         bb_rct.move_ip(avx, avy)  
-        # bb_rct.move_ip(vx, vy) 
         kk_rct.move_ip(sum_mv)
 
         yoko, tate = check_bound(bb_rct)
@@ -159,11 +155,11 @@ def main():
         if not tate:  # 爆弾が上下どちらかにはみ出ていたら
             vy *= -1
         
-        if check_bound(kk_rct) != (True, True):
+        if check_bound(kk_rct) != (True, True): # こうかとんが画面外だったら
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
 
-        if kk_rct.colliderect(bb_rct):
-            gameover(screen)
+        if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾がかさなったら
+            gameover(screen)  # ゲームオーバー画面を表示
             return
         
         screen.blit(kk_img, kk_rct)
