@@ -36,13 +36,13 @@ def gameover(screen: pg.Surface) -> None:
     ゲームオーバー時に，半透明の黒い画面上に「Game Over」と表
     示し，泣いているこうかとん画像を貼り付ける関数
     """
-    gameover_sur = pg.Surface((1100, 650))
+    gameover_sur = pg.Surface((WIDTH, HEIGHT))
     font = pg.font.Font(None, 80)
     cry = pg.image.load("fig/8.png") 
     cry2 = pg.image.load("fig/8.png") 
     gameover_txt = font.render("Game Over",True,(255, 255, 255))
     gameover_sur.set_alpha(130)
-    pg.draw.rect(gameover_sur, (0, 0, 0), pg.Rect(0, 0, 1100, 650))
+    pg.draw.rect(gameover_sur, (0, 0, 0), pg.Rect(0, 0, WIDTH, HEIGHT))
     screen.blit(gameover_sur, [0, 0])
     screen.blit(gameover_txt, [400, 300])
     screen.blit(cry, [340, 290])
@@ -70,15 +70,17 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     """
     移動量の合計値タプルに対応する向きの画像Surfaceを返す
     """
-    koukaton = {(0, 0) :  pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9), 
-                (0, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 270, 0.9),
-                (+5, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 225, 0.9),
-                (+5, 0) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 180, 0.9),
-                (+5, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 135, 0.9),
-                (0, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 90, 0.9),
-                (-5, +5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),
-                (-5, 0) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),
-                (-5, -5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 315, 0.9)}
+    koukaton = {
+        (0, 0) :  pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9), 
+        (0, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 270, 0.9),
+        (+5, -5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 225, 0.9),
+        (+5, 0) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 180, 0.9),
+        (+5, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 135, 0.9),
+        (0, +5) : pg.transform.rotozoom(pg.transform.flip(pg.image.load("fig/3.png"), False, True), 90, 0.9),
+        (-5, +5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),
+        (-5, 0) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),
+        (-5, -5) : pg.transform.rotozoom(pg.image.load("fig/3.png"), 315, 0.9),
+    }
     return koukaton[sum_mv]
 
 def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float]) -> tuple[float, float]:
@@ -97,9 +99,24 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float])
     last_d = (dx, dy)
 
     return last_d
+
+def elapsed_time(start_time: float, font: pg.font) -> pg.Surface:
+    """
+    独自の機能
+    経過時間のSurfaceを返す
+    """
+    elaps = 0
+    end = time.perf_counter()
+    elaps = int(end - start_time)
+    txt = font.render(str(elaps), True, (255, 255, 255))
+
+    return txt
+
             
 
 def main():
+    start = time.perf_counter()
+
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     # こうかとん初期化
@@ -117,8 +134,10 @@ def main():
 
     clock = pg.time.Clock()
     tmr = 0
+    font2 = pg.font.Font(None, 80)
     
     while True:
+        
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
@@ -164,6 +183,7 @@ def main():
         
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
+        screen.blit(elapsed_time(start, font2), [1000, 550])
 
         pg.display.update()
         tmr += 1
