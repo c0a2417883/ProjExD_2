@@ -115,7 +115,6 @@ def elapsed_time(start_time: float, font: pg.font) -> pg.Surface:
     return txt
 
             
-
 def main():
     start = time.perf_counter()
 
